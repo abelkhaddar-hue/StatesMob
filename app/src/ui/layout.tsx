@@ -12,7 +12,7 @@ import { Banner } from './primitives'
 const column = { width: '100%', maxWidth: tokens.layout['max-content'], alignSelf: 'center' } as const
 
 export function Header({ title, onBack, close }: { title?: string; onBack?: () => void; close?: boolean }) {
-  const back = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/home')))
+  const back = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')))
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: tokens.layout.header, paddingHorizontal: 8 }}>
       <IconButton icon={close ? X : ArrowLeft} label={close ? 'Close' : 'Back'} variant="ghost" onPress={back} />
