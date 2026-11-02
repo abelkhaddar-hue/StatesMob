@@ -127,7 +127,7 @@ export default function Home() {
             </View>
           </View>
 
-          <Text variant="xs" tone="muted" center>© 2026 SafeMobility · Demo app — requests are not sent to dispatch yet.</Text>
+          <Text variant="xs" tone="muted" center>© 2026 StatesMob · Demo app — requests are not sent to dispatch yet.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

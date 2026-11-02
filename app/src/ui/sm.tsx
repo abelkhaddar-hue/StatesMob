@@ -17,9 +17,9 @@ export function Eyebrow({ children, tone = 'muted' }: { children: string; tone?:
 export function BrandBar({ right }: { right?: ReactNode }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: tokens.layout.header, paddingHorizontal: tokens.layout.gutter }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }} accessible accessibilityLabel="SafeMobility">
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }} accessible accessibilityLabel="StatesMob">
         <Image source={require('../../assets/brand/logo.png')} style={{ width: 32, height: 32, borderRadius: 6 }} accessibilityIgnoresInvertColors />
-        <Text variant="label-lg" weight={600}>SafeMobility</Text>
+        <Text variant="label-lg" weight={600}>States<Text variant="label-lg" weight={600} style={{ color: color('accent') }}>Mob</Text></Text>
       </View>
       {right ?? <CallButton compact />}
     </View>
@@ -28,9 +28,9 @@ export function BrandBar({ right }: { right?: ReactNode }) {
 
 // Appeler le dispatch. Le numéro reste affiché en texte : le lien « tel: » ne marche pas partout.
 export function CallButton({ compact }: { compact?: boolean }) {
-  if (compact) return <IconButton icon={Phone} label={`Call SafeMobility, ${DISPATCH_PHONE}`} variant="accent" size={40} onPress={() => Linking.openURL(DISPATCH_TEL).catch(() => {})} />
+  if (compact) return <IconButton icon={Phone} label={`Call StatesMob, ${DISPATCH_PHONE}`} variant="accent" size={40} onPress={() => Linking.openURL(DISPATCH_TEL).catch(() => {})} />
   return (
-    <Touchable onPress={() => Linking.openURL(DISPATCH_TEL).catch(() => {})} accessibilityRole="button" accessibilityLabel={`Call SafeMobility, ${DISPATCH_PHONE}`}
+    <Touchable onPress={() => Linking.openURL(DISPATCH_TEL).catch(() => {})} accessibilityRole="button" accessibilityLabel={`Call StatesMob, ${DISPATCH_PHONE}`}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: tokens.radius.lg, borderWidth: 1, borderColor: color('border'), backgroundColor: pressed ? color('surface-2') : color('surface') })}>
       <View style={{ width: 40, height: 40, borderRadius: tokens.radius.pill, backgroundColor: color('accent'), alignItems: 'center', justifyContent: 'center' }}>
         <Phone size={18} color={color('on-accent')} />

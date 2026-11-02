@@ -54,7 +54,7 @@ export const statusSteps: { status: ReservationStatus; label: string; detail: st
   { status: 'confirmed', label: 'Confirmed', detail: 'Your ride is booked. We will text you before pickup.' },
   { status: 'driver_assigned', label: 'Driver assigned', detail: 'Your driver and vehicle are set.' },
   { status: 'on_the_way', label: 'Driver on the way', detail: 'Your driver is heading to the pickup location.' },
-  { status: 'completed', label: 'Completed', detail: 'Thanks for riding with SafeMobility.' },
+  { status: 'completed', label: 'Completed', detail: 'Thanks for riding with StatesMob.' },
 ]
 
 export type Contact = { fullName: string; phone: string; email: string }
