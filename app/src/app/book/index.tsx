@@ -37,7 +37,8 @@ function PaymentChoice({ value, onChange }: { value: Payment | null; onChange: (
 // Réservation d'une course privée, en étapes (le long formulaire du site, découpé pour le téléphone).
 export default function Book() {
   const d = useDraft()
-  const [step, setStep] = useState(0)
+  // Adresses et type déjà choisis à l'accueil : on commence directement à la date.
+  const [step, setStep] = useState(() => { const x = draft.get(); return x.pickup.trim() && x.destination.trim() && x.tripType ? 1 : 0 })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const send = useAction(booking.requestRide)
 

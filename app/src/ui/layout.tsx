@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, RefreshControl, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import { ArrowLeft, X } from 'lucide-react-native'
@@ -30,8 +30,33 @@ export function Screen({ title, children, footer, close, onBack, scroll = true, 
     <SafeAreaView style={{ flex: 1, backgroundColor: color(tone) }} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={column}><Header title={title} close={close} onBack={onBack} /></View>
-        {scroll ? <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">{body}</ScrollView> : body}
+        {scroll ? <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">{body}</ScrollView> : body}
         {footer ? <View style={[column, { padding: tokens.layout.gutter, gap: 8 }]}>{footer}</View> : null}
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  )
+}
+
+// Écran d'onglet : grand titre comme sur iOS, pas de retour, tirer vers le bas pour actualiser.
+export function TabScreen({ title, right, children, refreshing, onRefresh, top }: {
+  title?: string; right?: ReactNode; children: ReactNode; refreshing?: boolean; onRefresh?: () => void; top?: ReactNode
+}) {
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: color('bg') }} edges={['top']}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {top}
+        <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+          refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={color('accent')} colors={[color('on-accent')]} progressBackgroundColor={color('accent')} /> : undefined}>
+          <View style={[column, { padding: tokens.layout.gutter, gap: 20 }]}>
+            {title ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: 4 }}>
+                <Text variant="xl" heading style={{ flex: 1 }}>{title}</Text>
+                {right}
+              </View>
+            ) : null}
+            {children}
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

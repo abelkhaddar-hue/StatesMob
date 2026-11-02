@@ -123,6 +123,26 @@ function withDemoProgress(r: Reservation): Reservation {
 export const booking = {
   savedContact: (): Contact | undefined => load().contact,
 
+  // Profil (onglet Compte) : pré-remplit les réservations et retrouve « Mes courses ».
+  saveContact: async (c: Contact): Promise<Contact> => {
+    await wait(250)
+    if (!c.fullName.trim()) throw new ApiError('name_required', 'Add your full name.')
+    if (!isUsPhone(c.phone)) throw new ApiError('invalid_phone', 'Enter a 10-digit US phone number.')
+    if (!isEmail(c.email)) throw new ApiError('invalid_email', 'Enter a valid email address.')
+    const contact = { fullName: c.fullName.trim(), phone: phoneDigits(c.phone), email: c.email.trim() }
+    save({ ...load(), contact })
+    return contact
+  },
+
+  // « Mes courses » : les réservations du numéro enregistré sur ce téléphone, sans le retaper.
+  myBookings: async (): Promise<(Reservation | WeeklyReservation)[]> => {
+    const c = load().contact
+    return c ? booking.track(c.phone) : []
+  },
+
+  // Démo : repartir de zéro (réservations et profil).
+  clearDemo: () => save({ rides: [], weekly: [] }),
+
   requestRide: async (input: RideRequest): Promise<Reservation> => {
     await wait()
     if (!input.pickup.trim() || !input.destination.trim()) throw new ApiError('address_required', 'Add a pickup location and a destination.')

@@ -6,6 +6,7 @@ import { color, monoLabel, tokens } from '@/theme'
 import { DISPATCH_PHONE, DISPATCH_TEL, statusSteps, type ReservationStatus } from '@/data/booking'
 import { Text } from './Text'
 import { Touchable } from './Pressable'
+import { haptic } from './haptics'
 import { IconButton } from './Button'
 import { Field } from './Field'
 
@@ -64,7 +65,7 @@ export function Choices<T extends string>({ options, value, onChange, columns = 
       {options.map((o) => {
         const on = o.value === value
         return (
-          <Touchable key={o.value} onPress={() => onChange(o.value)} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={o.label}
+          <Touchable key={o.value} onPress={() => { haptic.select(); onChange(o.value) }} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={o.label}
             style={({ pressed }) => ({
               width: columns === 1 ? '100%' : `${100 / columns - 2}%`, minHeight: 48, paddingHorizontal: 14, justifyContent: 'center',
               borderRadius: tokens.radius.md, borderWidth: 1,
@@ -83,9 +84,9 @@ export function Stepper({ label, value, min = 1, max = 7, onChange, plusLabel }:
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: 14, borderRadius: tokens.radius.md, borderWidth: 1, borderColor: color('border'), backgroundColor: color('surface') }}>
       <Text style={{ flex: 1 }}>{label}</Text>
-      <IconButton icon={Minus} size={40} variant="ghost" label={`Fewer ${label.toLowerCase()}`} disabled={value <= min} onPress={() => onChange(value - 1)} />
+      <IconButton icon={Minus} size={40} variant="ghost" label={`Fewer ${label.toLowerCase()}`} disabled={value <= min} onPress={() => { haptic.select(); onChange(value - 1) }} />
       <Text variant="lg" tabular accessibilityLiveRegion="polite" accessibilityLabel={`${value}${value >= max && plusLabel ? ' or more' : ''} ${label.toLowerCase()}`}>{value >= max && plusLabel ? plusLabel : value}</Text>
-      <IconButton icon={Plus} size={40} variant="ghost" label={`More ${label.toLowerCase()}`} disabled={value >= max} onPress={() => onChange(value + 1)} />
+      <IconButton icon={Plus} size={40} variant="ghost" label={`More ${label.toLowerCase()}`} disabled={value >= max} onPress={() => { haptic.select(); onChange(value + 1) }} />
     </View>
   )
 }
@@ -114,7 +115,7 @@ export function DateChips({ value, onChange }: { value: string; onChange: (v: st
       {nextDays().map((d) => {
         const on = d.value === value
         return (
-          <Touchable key={d.value} onPress={() => onChange(d.value)} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={d.label}
+          <Touchable key={d.value} onPress={() => { haptic.select(); onChange(d.value) }} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={d.label}
             style={{ width: 64, paddingVertical: 10, alignItems: 'center', gap: 2, borderRadius: tokens.radius.md, borderWidth: 1, borderColor: on ? color('accent') : color('border'), backgroundColor: on ? color('accent-soft') : color('surface') }}>
             <Text variant="xs" style={[monoLabel, { color: color(on ? 'on-accent-soft' : 'text-muted') }]}>{d.top}</Text>
             <Text variant="sm" weight={600} style={{ color: color(on ? 'on-accent-soft' : 'text') }}>{d.bottom}</Text>
@@ -145,7 +146,7 @@ export function TimeChips({ value, onChange, date }: { value: string; onChange: 
         {slots.map((t) => {
           const on = t.value === value
           return (
-            <Touchable key={t.value} onPress={() => onChange(t.value)} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={t.label}
+            <Touchable key={t.value} onPress={() => { haptic.select(); onChange(t.value) }} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={t.label}
               style={{ paddingHorizontal: 14, height: 44, justifyContent: 'center', borderRadius: tokens.radius.pill, borderWidth: 1, borderColor: on ? color('accent') : color('border'), backgroundColor: on ? color('accent-soft') : color('surface') }}>
               <Text variant="sm" weight={on ? 600 : 400} tabular style={{ color: color(on ? 'on-accent-soft' : 'text') }}>{t.label}</Text>
             </Touchable>

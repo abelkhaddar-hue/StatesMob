@@ -8,6 +8,7 @@ import { Screen } from '@/ui/layout'
 import { Text } from '@/ui/Text'
 import { Button } from '@/ui/Button'
 import { Touchable } from '@/ui/Pressable'
+import { haptic } from '@/ui/haptics'
 import { Banner } from '@/ui/primitives'
 import { Field } from '@/ui/Field'
 import { AddressInput, Eyebrow, Stepper, timeSlots } from '@/ui/sm'
@@ -23,7 +24,7 @@ function TimeSelect({ label, value, onChange, from, to }: { label: string; value
         {slots.map((t) => {
           const on = t.value === value
           return (
-            <Touchable key={t.value} onPress={() => onChange(t.value)} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={t.label}
+            <Touchable key={t.value} onPress={() => { haptic.select(); onChange(t.value) }} accessibilityRole="radio" accessibilityState={{ checked: on }} accessibilityLabel={t.label}
               style={{ paddingHorizontal: 12, height: 40, justifyContent: 'center', borderRadius: tokens.radius.pill, borderWidth: 1, borderColor: on ? color('accent') : color('border'), backgroundColor: on ? color('accent-soft') : color('surface') }}>
               <Text variant="sm" tabular style={{ color: color(on ? 'on-accent-soft' : 'text') }}>{t.label}</Text>
             </Touchable>
@@ -61,7 +62,7 @@ export default function Weekly() {
           {DAYS.map((day) => {
             const on = f.days.includes(day)
             return (
-              <Touchable key={day} onPress={() => set({ days: on ? f.days.filter((x) => x !== day) : DAYS.filter((x) => x === day || f.days.includes(x)) })}
+              <Touchable key={day} onPress={() => { haptic.select(); set({ days: on ? f.days.filter((x) => x !== day) : DAYS.filter((x) => x === day || f.days.includes(x)) }) }}
                 accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={day}
                 style={{ flex: 1, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: tokens.radius.md, borderWidth: 1, borderColor: on ? color('accent') : color('border'), backgroundColor: on ? color('accent-soft') : color('surface') }}>
                 <Text variant="xs" weight={600} style={{ color: color(on ? 'on-accent-soft' : 'text-muted') }}>{day}</Text>

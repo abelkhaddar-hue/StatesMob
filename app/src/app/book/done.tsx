@@ -10,7 +10,7 @@ import { CallButton, Eyebrow, StatusTimeline } from '@/ui/sm'
 // Demande envoyée : comme sur le site, c'est l'équipe de dispatch qui confirme ensuite.
 export default function BookDone() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const home = () => router.replace('/')
+  const home = () => router.dismissTo('/')
   return (
     <Screen close onBack={home} footer={<>
       <Button label="Track this ride" size="lg" onPress={() => router.replace({ pathname: '/track/[id]', params: { id } })} />

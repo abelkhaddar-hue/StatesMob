@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react-native'
 import { color, monoLabel, tokens, shadow, type ColorRole, type TypeStep } from '@/theme'
 import { Text } from './Text'
 import { Touchable } from './Pressable'
+import { haptic } from './haptics'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
@@ -44,7 +45,7 @@ export function Button({ label, onPress, variant = 'primary', size = 'md', icon:
   const labelStyle = { color: fg }
   return (
     <Touchable
-      onPress={inactive ? undefined : onPress}
+      onPress={inactive || !onPress ? undefined : () => { haptic.tap(); onPress() }}
       disabled={inactive}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
@@ -85,7 +86,7 @@ export function IconButton({ icon: Icon, label, onPress, variant = 'surface', si
   const fg = disabled ? color('disabled-text') : variant === 'accent' ? color('on-accent') : color('text')
   return (
     <Touchable
-      onPress={onPress}
+      onPress={onPress ? () => { haptic.tap(); onPress() } : undefined}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}

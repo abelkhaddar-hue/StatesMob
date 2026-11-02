@@ -5,20 +5,24 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/brand/logo.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#000000",
+        "backgroundColor": "#0e2133",
         "foregroundImage": "./assets/brand/logo.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/brand/logo.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "StatesMob",
+      "shortName": "StatesMob",
+      "themeColor": "#071a2c",
+      "backgroundColor": "#071a2c"
     },
     "plugins": [
       "expo-router",
@@ -27,6 +31,7 @@
     "scheme": "safemobility",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "backgroundColor": "#071a2c"
   }
 }

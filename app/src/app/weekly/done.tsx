@@ -9,7 +9,7 @@ import { CallButton, Eyebrow } from '@/ui/sm'
 
 export default function WeeklyDone() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const home = () => router.replace('/')
+  const home = () => router.dismissTo('/')
   return (
     <Screen close onBack={home} footer={<Button label="Back to home" size="lg" onPress={home} />}>
       <View style={{ alignItems: 'center', gap: 10, paddingVertical: 8 }}>
