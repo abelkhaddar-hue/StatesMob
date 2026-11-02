@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { useFocusEffect } from 'expo-router'
-import { Info, RotateCcw } from 'lucide-react-native'
+import { router, useFocusEffect } from 'expo-router'
+import { Info, KeyRound, RotateCcw } from 'lucide-react-native'
 import { booking, formatUsPhone, serviceAreas } from '@/data/booking'
 import { rides } from '@/data/ride'
 import { draft } from '@/data/draft'
+import { driver, STEPS, type DriverStatus } from '@/data/driver'
 import { useAction } from '@/data/hooks'
 import { color, tokens } from '@/theme'
 import { TabScreen } from '@/ui/layout'
@@ -15,18 +16,26 @@ import { Field } from '@/ui/Field'
 import { haptic } from '@/ui/haptics'
 import { CallButton, Eyebrow } from '@/ui/sm'
 
+const driveDetail = (s: DriverStatus) => {
+  if (s === 'draft') { const a = driver.open(); return `Application saved · step ${a.step + 1} of ${STEPS.length}` }
+  if (s === 'docs_review' || s === 'background_check') return 'Application under review'
+  if (s === 'approved') return 'Approved · driver mode coming soon'
+  return 'Name your price as a driver. Apply in 10 minutes.'
+}
+
 // Compte : coordonnées du passager, dispatch, zones desservies, remise à zéro de la démo.
 export default function Account() {
   const [f, setF] = useState({ fullName: '', phone: '', email: '' })
   const [saved, setSaved] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [drive, setDrive] = useState<DriverStatus>('none')
   const save = useAction(booking.saveContact)
   const set = (p: Partial<typeof f>) => { setF((x) => ({ ...x, ...p })); setSaved(false); save.setError(undefined) }
 
   useFocusEffect(useCallback(() => {
     const c = booking.savedContact()
     setF(c ? { fullName: c.fullName, phone: formatUsPhone(c.phone), email: c.email } : { fullName: '', phone: '', email: '' })
-    setSaved(false); setConfirmReset(false)
+    setSaved(false); setConfirmReset(false); setDrive(driver.status())
   }, []))
 
   const submit = async () => {
@@ -35,7 +44,7 @@ export default function Account() {
   }
 
   const reset = () => {
-    rides.clear(); booking.clearContact(); draft.set({ dropoff: null, quote: null, offeredCents: null })
+    rides.clear(); booking.clearContact(); driver.clear(); setDrive('none'); draft.set({ dropoff: null, quote: null, offeredCents: null })
     setF({ fullName: '', phone: '', email: '' }); setConfirmReset(false); haptic.success()
   }
 
@@ -59,14 +68,18 @@ export default function Account() {
         <Button label="Save details" variant="secondary" fullWidth loading={save.busy} onPress={submit} />
       </View>
 
+      <ListGroup>
+        <ListRow icon={KeyRound} label={drive === 'approved' ? 'Driver account' : 'Drive with StatesMob'} detail={driveDetail(drive)} onPress={() => router.push('/driver')} />
+      </ListGroup>
+
       <CallButton />
 
       <ListGroup>
-        <ListRow icon={RotateCcw} label="Reset demo data" detail="Clear rides and saved details" danger onPress={() => setConfirmReset(true)} />
+        <ListRow icon={RotateCcw} label="Reset demo data" detail="Clear rides, details and driver application" danger onPress={() => setConfirmReset(true)} />
       </ListGroup>
       {confirmReset ? (
         <View style={{ gap: 8 }}>
-          <Banner kind="danger" title="Clear all demo rides and your details?" />
+          <Banner kind="danger" title="Clear all demo rides, your details and driver application?" />
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <Button label="Yes, clear" variant="danger" onPress={reset} />
             <Button label="Keep" variant="secondary" onPress={() => setConfirmReset(false)} />
