@@ -2,6 +2,8 @@
 // suivi du chauffeur sur la carte, note à la fin. Tout est calculé à partir de l'heure : l'état survit
 // au rechargement de la page (localStorage sur le web).
 import { ApiError } from './booking'
+import { live } from './supabase'
+import { makeLiveRides } from './live'
 
 export type LngLat = { lng: number; lat: number }
 export type PlaceKind = 'landmark' | 'airport' | 'stadium' | 'mall' | 'station' | 'street' | 'recent'
@@ -43,6 +45,7 @@ export type RideView = {
   driverPosition: (LngLat & { heading: number }) | null; etaS: number | null
   acceptedAt: string; startedAt?: string; completedAt?: string; cancelledAt?: string
   stars?: number; rated: boolean
+  passengerName?: string; cancelledBy?: 'passenger' | 'driver'
 }
 
 // ───────── lieux de Cincinnati ─────────
@@ -94,7 +97,8 @@ const recommendedFare = (s: ServiceCode, distM: number, durS: number) => {
 
 // Durées de la démo (secondes) : assez courtes pour tout voir en une minute et demie.
 const APPROACH_S = 30, WAIT_S = 10, TRIP_S = 40, OFFER_TTL_S = 45, REQUEST_TTL_S = 600
-export const OFFER_TTL = OFFER_TTL_S
+// En base, une offre de chauffeur reste valable 60 s.
+export const OFFER_TTL = live ? 60 : OFFER_TTL_S
 
 // ───────── géométrie ─────────
 
@@ -213,7 +217,7 @@ export const geo = {
   },
 }
 
-export const rides = {
+const fakeRides = {
   quote: async (a: LngLat, b: LngLat, service: ServiceCode): Promise<Quote> => {
     await wait(250)
     if (!inArea(a)) throw new ApiError('pickup_outside', 'This pickup is outside our service area.')
@@ -324,6 +328,10 @@ export const rides = {
 
   clear: () => save({ requests: [], offers: {}, declined: [], rides: [], recent: ['p2', 'p4'] }),
 }
+
+// Base branchée : vraies demandes et vrais chauffeurs. Sinon : démo hors ligne avec chauffeurs simulés.
+export const liveRides = makeLiveRides({ trip, recommendedFare, fakeRoute, alongRoute })
+export const rides = live ? { ...fakeRides, ...liveRides.rides } : fakeRides
 
 export const formatUSD = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`
 export const formatMiles = (m: number) => `${(m / 1609.34).toLocaleString('en-US', { maximumFractionDigits: 1 })} mi`

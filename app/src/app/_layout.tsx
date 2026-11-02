@@ -22,6 +22,7 @@ export default function RootLayout() {
         {/* Pendant la recherche et la course, pas de retour par geste : on passe par les boutons. */}
         <Stack.Screen name="request/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="ride/[id]/index" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="drive/ride/[id]" options={{ gestureEnabled: false }} />
       </Stack>
     </SafeAreaProvider>
   )

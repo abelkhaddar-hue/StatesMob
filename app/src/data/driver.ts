@@ -1,6 +1,8 @@
 // Candidature chauffeur (démo : tout reste sur l'appareil, la validation avance toute seule avec le temps).
 import { ApiError, booking, formatUsPhone, isEmail, isUsPhone, phoneDigits } from './booking'
-import type { ServiceCode } from './ride'
+import { liveRides, type RideRequest, type RideView, type ServiceCode } from './ride'
+import { live, rpc, signOut } from './supabase'
+import type { RawRide } from './live'
 
 export type VehicleType = 'sedan' | 'suv' | 'minivan'
 export type DocCode = 'license' | 'insurance' | 'registration' | 'photo'
@@ -153,8 +155,39 @@ export const driver = {
       if (Object.keys(validate(i, a)).length) throw new ApiError('incomplete', `Some details in “${STEPS[i]}” need attention.`)
     }
     const done = { ...a, phone: phoneDigits(a.phone), plate: a.plate.trim().toUpperCase(), submittedAt: new Date().toISOString() }
+    // Base branchée : le chauffeur existe pour de vrai et pourra recevoir les demandes une fois validé.
+    if (live) {
+      await rpc('driver', 'driver_register', { p: {
+        firstName: done.firstName, lastName: done.lastName, phone: done.phone, city: done.city, services: eligibleServices(done),
+        vehicle: { type: done.vehicleType, seats: done.seats, make: done.make.trim(), model: done.model.trim(), year: +done.year, color: done.color.trim(), plate: done.plate },
+      } })
+    }
     store(done)
     return view(done)
   },
-  clear: () => { try { globalThis.localStorage?.removeItem(KEY) } catch { /* idem */ } },
+  clear: () => { try { globalThis.localStorage?.removeItem(KEY) } catch { /* idem */ } signOut('driver') },
+}
+
+// ───────── mode chauffeur (base réelle uniquement) ─────────
+
+export type DriverAccount = {
+  id: string; firstName: string; lastName: string; city: string; services: ServiceCode[]; rating: number; rides: number
+  vehicle: { type: VehicleType; seats: number; make: string; model: string; year: number; color: string; plate: string }
+  approvedAt: string; approved: boolean; online: boolean
+}
+export type MyOffer = { id: string; fareCents: number; status: 'open' | 'declined' | 'accepted' | 'withdrawn' | 'expired'; expiresAt: string }
+export type FeedRequest = RideRequest & { passengerName: string; myOffer: MyOffer | null }
+export type DriverFeed = { online: boolean; rideId?: string | null; requests: FeedRequest[] }
+export type DriverRide = RideView & { passengerName: string; cancelledBy?: 'passenger' | 'driver' }
+
+export const driving = {
+  me: () => rpc<DriverAccount | null>('driver', 'driver_me'),
+  setOnline: (online: boolean) => rpc<DriverAccount>('driver', 'driver_set_online', { p_online: online }),
+  feed: () => rpc<DriverFeed>('driver', 'driver_feed'),
+  sendOffer: (requestId: string, cents: number) => rpc<void>('driver', 'driver_send_offer', { p_request: requestId, p_cents: cents }),
+  ride: async (id: string): Promise<DriverRide> => liveRides.toView(await rpc<RawRide>('driver', 'get_ride', { p_id: id })),
+  advance: async (id: string, status: 'driver_arrived' | 'in_progress' | 'completed'): Promise<DriverRide> =>
+    liveRides.toView(await rpc<RawRide>('driver', 'driver_advance', { p_ride: id, p_status: status })),
+  cancel: (id: string) => rpc<void>('driver', 'cancel_ride', { p_id: id }),
+  history: async (): Promise<DriverRide[]> => (await rpc<RawRide[]>('driver', 'driver_rides')).map(liveRides.toView),
 }

@@ -5,6 +5,7 @@ import { formatUsPhone } from '@/data/booking'
 import { services } from '@/data/ride'
 import { driver, eligibleServices, STEPS, type DriverStatus, type DriverView } from '@/data/driver'
 import { useLoad } from '@/data/hooks'
+import { live } from '@/data/supabase'
 import { color, tokens } from '@/theme'
 import { Loading, Screen } from '@/ui/layout'
 import { Text } from '@/ui/Text'
@@ -73,7 +74,10 @@ function Review({ view }: { view: DriverView }) {
   const approved = view.status === 'approved'
   const can = eligibleServices(a).map((c) => services.find((s) => s.code === c)!.name).join(' · ')
   return (
-    <Screen title="Driver application" footer={<Button label={approved ? 'Back to the app' : 'Done'} size="lg" fullWidth onPress={() => router.dismissTo('/')} />}>
+    <Screen title="Driver application" footer={approved && live ? <>
+      <Button label="Open driver mode" size="lg" fullWidth onPress={() => router.replace('/drive')} />
+      <Button label="Back to the app" variant="ghost" fullWidth onPress={() => router.dismissTo('/')} />
+    </> : <Button label={approved ? 'Back to the app' : 'Done'} size="lg" fullWidth onPress={() => router.dismissTo('/')} />}>
       <View style={{ gap: 4 }} accessibilityLiveRegion="polite">
         <Text variant="xl" heading>{approved ? `You're approved, ${a.firstName}!` : 'We are reviewing your application'}</Text>
         <Text tone="muted">{approved ? `Welcome to StatesMob. We sent your driver kit to ${a.email}.` : 'This usually takes 1 to 3 business days. In this demo, under a minute.'}</Text>
@@ -112,7 +116,7 @@ function Review({ view }: { view: DriverView }) {
         <Text variant="sm" tone="muted">{formatUsPhone(a.phone)} · {a.city}</Text>
       </View>
 
-      {approved ? <Banner kind="success" title="Driver mode is next" body="Soon you'll go online here, receive ride requests and send your offers." /> : null}
+      {approved && !live ? <Banner kind="success" title="Driver mode is next" body="Soon you'll go online here, receive ride requests and send your offers." /> : null}
       <CallButton />
     </Screen>
   )

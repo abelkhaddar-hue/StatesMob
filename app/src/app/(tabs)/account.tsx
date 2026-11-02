@@ -5,6 +5,7 @@ import { Info, KeyRound, RotateCcw } from 'lucide-react-native'
 import { booking, formatUsPhone, serviceAreas } from '@/data/booking'
 import { rides } from '@/data/ride'
 import { draft } from '@/data/draft'
+import { live, signOut } from '@/data/supabase'
 import { driver, STEPS, type DriverStatus } from '@/data/driver'
 import { useAction } from '@/data/hooks'
 import { color, tokens } from '@/theme'
@@ -19,7 +20,7 @@ import { CallButton, Eyebrow } from '@/ui/sm'
 const driveDetail = (s: DriverStatus) => {
   if (s === 'draft') { const a = driver.open(); return `Application saved · step ${a.step + 1} of ${STEPS.length}` }
   if (s === 'docs_review' || s === 'background_check') return 'Application under review'
-  if (s === 'approved') return 'Approved · driver mode coming soon'
+  if (s === 'approved') return live ? 'Approved · open driver mode' : 'Approved · driver mode coming soon'
   return 'Name your price as a driver. Apply in 10 minutes.'
 }
 
@@ -44,7 +45,7 @@ export default function Account() {
   }
 
   const reset = () => {
-    rides.clear(); booking.clearContact(); driver.clear(); setDrive('none'); draft.set({ dropoff: null, quote: null, offeredCents: null })
+    rides.clear(); booking.clearContact(); driver.clear(); signOut('passenger'); setDrive('none'); draft.set({ dropoff: null, quote: null, offeredCents: null })
     setF({ fullName: '', phone: '', email: '' }); setConfirmReset(false); haptic.success()
   }
 
@@ -69,7 +70,7 @@ export default function Account() {
       </View>
 
       <ListGroup>
-        <ListRow icon={KeyRound} label={drive === 'approved' ? 'Driver account' : 'Drive with StatesMob'} detail={driveDetail(drive)} onPress={() => router.push('/driver')} />
+        <ListRow icon={KeyRound} label={drive === 'approved' ? 'Driver account' : 'Drive with StatesMob'} detail={driveDetail(drive)} onPress={() => router.push(drive === 'approved' && live ? '/drive' : '/driver')} />
       </ListGroup>
 
       <CallButton />
@@ -100,7 +101,7 @@ export default function Account() {
 
       <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
         <Info size={14} color={color('text-muted')} />
-        <Text variant="xs" tone="muted">StatesMob 1.0 · Demo — requests are not sent to dispatch yet.</Text>
+        <Text variant="xs" tone="muted">{live ? 'StatesMob 1.0 · Test server — rides are real requests to real drivers.' : 'StatesMob 1.0 · Demo — requests are not sent to dispatch yet.'}</Text>
       </View>
     </TabScreen>
   )
