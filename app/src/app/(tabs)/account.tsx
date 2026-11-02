@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { router, useFocusEffect } from 'expo-router'
-import { CalendarRange, Info, RotateCcw } from 'lucide-react-native'
+import { useFocusEffect } from 'expo-router'
+import { Info, RotateCcw } from 'lucide-react-native'
 import { booking, formatUsPhone, serviceAreas } from '@/data/booking'
+import { rides } from '@/data/ride'
 import { draft } from '@/data/draft'
 import { useAction } from '@/data/hooks'
 import { color, tokens } from '@/theme'
@@ -14,7 +15,7 @@ import { Field } from '@/ui/Field'
 import { haptic } from '@/ui/haptics'
 import { CallButton, Eyebrow } from '@/ui/sm'
 
-// Compte : coordonnées enregistrées (pré-remplissent les réservations), dispatch, zones desservies.
+// Compte : coordonnées du passager, dispatch, zones desservies, remise à zéro de la démo.
 export default function Account() {
   const [f, setF] = useState({ fullName: '', phone: '', email: '' })
   const [saved, setSaved] = useState(false)
@@ -30,11 +31,11 @@ export default function Account() {
 
   const submit = async () => {
     const c = await save.run(f)
-    if (c) { haptic.success(); setSaved(true); draft.set({ fullName: c.fullName, phone: formatUsPhone(c.phone), email: c.email }) }
+    if (c) { haptic.success(); setSaved(true) }
   }
 
   const reset = () => {
-    booking.clearDemo(); draft.reset(); draft.set({ fullName: '', phone: '', email: '' })
+    rides.clear(); booking.clearContact(); draft.set({ dropoff: null, quote: null, offeredCents: null })
     setF({ fullName: '', phone: '', email: '' }); setConfirmReset(false); haptic.success()
   }
 
@@ -44,7 +45,7 @@ export default function Account() {
         <Avatar name={f.fullName || 'Guest'} size="lg" />
         <View style={{ flex: 1 }}>
           <Text variant="lg" heading numberOfLines={1}>{f.fullName || 'Guest'}</Text>
-          <Text variant="sm" tone="muted">{f.phone || 'Add your details to book faster'}</Text>
+          <Text variant="sm" tone="muted">{f.phone || 'Add your details so drivers can reach you'}</Text>
         </View>
       </View>
 
@@ -54,14 +55,13 @@ export default function Account() {
         <Field label="Phone" value={f.phone} onChangeText={(v) => set({ phone: formatUsPhone(v) })} placeholder="513-000-0000" keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" />
         <Field label="Email" value={f.email} onChangeText={(email) => set({ email })} placeholder="you@email.com" keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" />
         {save.error ? <Banner kind="danger" title={save.error} /> : null}
-        {saved ? <Banner kind="success" title="Details saved" body="We'll fill them in for your next booking." /> : null}
+        {saved ? <Banner kind="success" title="Details saved" body="Drivers will see your first name only." /> : null}
         <Button label="Save details" variant="secondary" fullWidth loading={save.busy} onPress={submit} />
       </View>
 
       <CallButton />
 
       <ListGroup>
-        <ListRow icon={CalendarRange} label="Weekly commute" detail="Home ↔ work, billed weekly" onPress={() => router.push('/weekly')} />
         <ListRow icon={RotateCcw} label="Reset demo data" detail="Clear rides and saved details" danger onPress={() => setConfirmReset(true)} />
       </ListGroup>
       {confirmReset ? (

@@ -1,23 +1,18 @@
 import { useSyncExternalStore } from 'react'
-import type { Payment, TripType } from './booking'
+import type { Payment, Place, Quote, ServiceCode } from './ride'
 
-// Brouillon de réservation partagé entre le formulaire rapide de l'accueil et le formulaire en étapes,
-// comme sur le site (« Get my quote » ouvre la réservation pré-remplie).
-export type Draft = {
-  pickup: string; destination: string; date: string; time: string; passengers: number
-  tripType: TripType | null; payment: Payment | null; notes: string
-  fullName: string; phone: string; email: string
-}
+// Brouillon de la demande, partagé entre l'accueil (carte), la recherche d'adresse et l'écran du prix.
+export type Draft = { service: ServiceCode; pickup: Place | null; dropoff: Place | null; quote: Quote | null; offeredCents: number | null; payment: Payment }
 
-const empty: Draft = { pickup: '', destination: '', date: '', time: '', passengers: 1, tripType: null, payment: null, notes: '', fullName: '', phone: '', email: '' }
-let state: Draft = empty
+const initial: Draft = { service: 'standard', pickup: null, dropoff: null, quote: null, offeredCents: null, payment: 'card' }
+let state: Draft = initial
 const listeners = new Set<() => void>()
 
 export const draft = {
   get: () => state,
   set: (patch: Partial<Draft>) => { state = { ...state, ...patch }; listeners.forEach((l) => l()) },
-  // Après une demande envoyée : on garde le contact, on vide le trajet.
-  reset: () => { state = { ...empty, fullName: state.fullName, phone: state.phone, email: state.email }; listeners.forEach((l) => l()) },
+  // Après une demande : on garde le départ et le moyen de paiement.
+  reset: () => { state = { ...initial, pickup: state.pickup, payment: state.payment }; listeners.forEach((l) => l()) },
 }
 
 export function useDraft() {

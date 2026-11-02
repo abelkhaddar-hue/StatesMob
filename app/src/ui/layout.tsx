@@ -63,7 +63,8 @@ export function TabScreen({ title, right, children, refreshing, onRefresh, top }
 }
 
 // Carte plein écran + panneau du bas (S05, S09, S11, S14).
-export function MapScreen({ map, children, top }: { map: ReactNode; children: ReactNode; top?: ReactNode }) {
+export function MapScreen({ map, children, top, onClose }: { map: ReactNode; children: ReactNode; top?: ReactNode; onClose?: () => void }) {
+  if (!top && onClose) top = <IconButton icon={X} label="Back to map" onPress={onClose} />
   return (
     <View style={{ flex: 1, backgroundColor: color('surface-2') }}>
       <View style={{ flex: 1 }}>{map}</View>

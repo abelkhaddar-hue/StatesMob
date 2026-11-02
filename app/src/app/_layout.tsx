@@ -14,7 +14,15 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color('bg') } }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color('bg') } }}>
+        <Stack.Screen name="(tabs)" />
+        {/* Recherche d'adresse et prix : panneaux qui montent du bas, comme dans les apps VTC. */}
+        <Stack.Screen name="place" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="fare" options={{ presentation: 'modal' }} />
+        {/* Pendant la recherche et la course, pas de retour par geste : on passe par les boutons. */}
+        <Stack.Screen name="request/[id]" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="ride/[id]/index" options={{ gestureEnabled: false }} />
+      </Stack>
     </SafeAreaProvider>
   )
 }

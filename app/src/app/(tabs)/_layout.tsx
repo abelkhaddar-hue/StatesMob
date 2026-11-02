@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { CalendarClock, Car, CircleUser } from 'lucide-react-native'
+import { CalendarClock, CircleUser, MapPinned } from 'lucide-react-native'
 import { color, fontFamily } from '@/theme'
 import { haptic } from '@/ui/haptics'
 
@@ -19,7 +19,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: color('bg') },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Ride', tabBarIcon: ({ color: c, size }) => <Car color={c} size={size} /> }} />
+      <Tabs.Screen name="index" options={{ title: 'Ride', tabBarIcon: ({ color: c, size }) => <MapPinned color={c} size={size} /> }} />
       <Tabs.Screen name="rides" options={{ title: 'My rides', tabBarIcon: ({ color: c, size }) => <CalendarClock color={c} size={size} /> }} />
       <Tabs.Screen name="account" options={{ title: 'Account', tabBarIcon: ({ color: c, size }) => <CircleUser color={c} size={size} /> }} />
     </Tabs>
