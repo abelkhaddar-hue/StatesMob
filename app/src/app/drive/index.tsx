@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { router } from 'expo-router'
-import { ClipboardList, CloudOff, Power, Radar, Sunrise, Timer } from 'lucide-react-native'
+import { ClipboardList, CloudOff, History, Power, Radar, Sunrise, Timer } from 'lucide-react-native'
 import { driver, driving, type DriverAccount, type DriverFeed, type FeedRequest } from '@/data/driver'
 import { formatMiles, formatMinutes, formatUSD, OFFER_TTL, services } from '@/data/ride'
 import { live } from '@/data/supabase'
@@ -10,7 +10,7 @@ import { color, tokens } from '@/theme'
 import { Loading, Screen } from '@/ui/layout'
 import { Text } from '@/ui/Text'
 import { Button } from '@/ui/Button'
-import { Banner, Chip, EmptyState } from '@/ui/primitives'
+import { Banner, Chip, EmptyState, ListGroup, ListRow } from '@/ui/primitives'
 import { CountdownBar, RouteSummary, SearchingPulse } from '@/ui/ride'
 import { haptic } from '@/ui/haptics'
 import { Eyebrow } from '@/ui/sm'
@@ -94,6 +94,9 @@ function Online({ account }: { account: DriverAccount }) {
         <Text variant="sm" tone="muted" style={{ flex: 1 }} numberOfLines={1}>· {v.color} {v.make} {v.model}</Text>
       </View>
       {toggle.error ? <Banner kind="danger" title={toggle.error} /> : null}
+      <ListGroup>
+        <ListRow icon={History} label="Ride history" detail={`${account.rides} trip${account.rides === 1 ? '' : 's'} · Earnings and ratings`} onPress={() => router.push('/drive/history')} />
+      </ListGroup>
 
       {!online ? (
         <EmptyState icon={Sunrise} title={`Ready, ${account.firstName}?`} body={`Go online to see ride requests near you: ${account.services.map((c) => services.find((s) => s.code === c)!.name).join(', ')}.`} />

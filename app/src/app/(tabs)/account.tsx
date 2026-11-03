@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
-import { Info, KeyRound, RotateCcw } from 'lucide-react-native'
+import { Info, KeyRound, RotateCcw, ReceiptText } from 'lucide-react-native'
 import { booking, formatUsPhone, serviceAreas } from '@/data/booking'
 import { rides } from '@/data/ride'
 import { draft } from '@/data/draft'
@@ -71,6 +71,7 @@ export default function Account() {
 
       <ListGroup>
         <ListRow icon={KeyRound} label={drive === 'approved' ? 'Driver account' : 'Drive with StatesMob'} detail={driveDetail(drive)} onPress={() => router.push(drive === 'approved' && live ? '/drive' : '/driver')} />
+        {drive === 'approved' && live ? <ListRow icon={ReceiptText} label="Driver ride history" detail="Trips you drove and what you earned" onPress={() => router.push('/drive/history')} /> : null}
       </ListGroup>
 
       <CallButton />
